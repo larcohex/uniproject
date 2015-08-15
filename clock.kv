@@ -1,0 +1,790 @@
+#:import os os
+#:import dirname os.path.dirname
+#:import join os.path.join
+#:import datetime datetime
+
+
+<NoImageButton@Button>:
+	background_color: (0, 0, 0, 0)
+	background_disabled_down: ""
+	background_disabled_normal: ""
+	background_down: ""
+	background_normal: ""
+
+
+<ImageButton@Button>:
+	background_color: (0, 0, 0, 0)
+	background_disabled_down: ""
+	background_disabled_normal: ""
+	background_down: ""
+	background_normal: ""
+	Image:
+		size: self.parent.size
+		x: self.parent.x + (self.parent.width - self.width) / 2
+		y: self.parent.y + (self.parent.height - self.height) / 2	
+		source: ""
+		size: self.parent.size if self.source else (0, 0)
+
+
+<CenteredText@Label>:
+	size: self.texture_size
+
+
+<LeftButton@Button>:
+	size_hint: (.2, 1)
+	background_color: (0, 0, 0, 0)
+	background_disabled_down: ""
+	background_disabled_normal: ""
+	background_down: ""
+	background_normal: ""
+	theme: "Dark"
+	Image:
+		x: self.parent.x + (self.parent.width - self.width) / 2
+		y: self.parent.y + (self.parent.height - self.height) / 2	
+		source: "data/icons/" + root.theme + "/png/32/br_prev.png"
+
+
+<RightButton@Button>:
+	size_hint: (.2, 1)
+	background_color: (0, 0, 0, 0)
+	background_disabled_down: ""
+	background_disabled_normal: ""
+	background_down: ""
+	background_normal: ""
+	theme: "Dark"
+	Image:
+		x: self.parent.x + (self.parent.width - self.width) / 2
+		y: self.parent.y + (self.parent.height - self.height) / 2	
+		source: "data/icons/" + root.theme + "/png/32/br_next.png"
+	
+
+
+<LoginScreen>:
+	BoxLayout:
+		canvas.before:
+			Rectangle:
+				size: self.size
+				source: "data/images/" + root.theme + ".png"
+		orientation: "vertical"
+		padding: (0, 5, 0, 0)
+		BoxLayout:
+			orientation: "horizontal"
+			size_hint: (1, .05)
+			id: statusBar
+
+			Label:
+				size_hint: (.1, 1)
+
+			Label:
+				size_hint: (.2, 1)
+				id: statusDate
+				font_name: "fonts/Roboto-Medium.ttf"
+				text: root.getDate()
+				size: self.texture_size
+				color: root.textColor
+
+			Label:
+				size_hint: (0.5, 1)
+
+			Label:
+				size_hint: (.1, 1)
+				id: statusTime
+				font_name: "fonts/Roboto-Medium.ttf"
+				text: root.getTime()
+				size: self.texture_size
+				color: root.textColor
+
+			Label:
+				size_hint: (.1, 1)
+
+
+		AnchorLayout:
+			anchor_x: "center"
+			anchor_y: "top"
+			size_hint: (1, .75)
+			GridLayout:
+				id: loginBox
+				cols: 1
+				size_hint_y: .8
+				size_hint_x: .6
+				height: self.row_default_height * 10
+				row_default_height: 44
+				row_force_default: True
+				padding: (5, 20, 5, 5)
+				spacing: 5
+				TextInput:
+					id: username
+					hint_text: "Username"
+					write_tab: False
+					font_size: 24
+					font_name: "fonts/Roboto-Medium.ttf"
+					multiline: False
+					on_text_validate: root.checkLogin()
+				TextInput:
+					id: password
+					hint_text: "Password"
+					write_tab: False
+					font_size: 24
+					font_name: "fonts/Roboto-Medium.ttf"
+					password: True
+					multiline: False
+					on_text_validate: root.checkLogin()
+				Button:
+					text: "Login"
+					font_size: 24
+					font_name: "fonts/Roboto-Medium.ttf"
+					size: self.texture_size
+					size_hint_x: .3
+					on_press: root.checkLogin()
+		BoxLayout:
+			orientation: "horizontal"
+			size_hint: (1, .15)
+			Button:
+				size_hint: (.15, 1)
+				background_color: (0, 0, 0, 0)
+				background_disabled_down: ""
+				background_disabled_normal: ""
+				background_down: ""
+				background_normal: ""
+
+				on_press: root.goToSettingsScreen()
+
+				Image:
+					x: self.parent.x + (self.parent.width - self.width) / 2
+					y: self.parent.y + (self.parent.height - self.height) / 2
+					source: "data/icons/" + root.theme + "/png/32/cog.png"
+
+			Button:
+				size_hint: (.15, 1)
+				background_color: (0, 0, 0, 0)
+				background_disabled_down: ""
+				background_disabled_normal: ""
+				background_down: ""
+				background_normal: ""
+
+				on_press: root.goToSleepScreen()
+
+				Image:
+					x: self.parent.x + (self.parent.width - self.width) / 2
+					y: self.parent.y + (self.parent.height - self.height) / 2
+					source: "data/icons/" + root.theme + "/png/32/padlock_closed.png"
+
+			Button:
+				size_hint: (0.15, 1)
+				background_color: (0, 0, 0, 0)
+				background_disabled_down: ""
+				background_disabled_normal: ""
+				background_down: ""
+				background_normal: ""
+
+				on_press: root.manager.current = "infoScreen"
+
+				Image:
+					x: self.parent.x + (self.parent.width - self.width) / 2
+					y: self.parent.y + (self.parent.height - self.height) / 2
+					source: "data/icons/" + root.theme + "/png/32/info.png"
+			
+
+
+			Label:
+				canvas:
+					Color:
+						rgba: (1, 1, 1, 1)
+				id: errorLabel
+				font_size: 18
+				font_name: "fonts/Roboto-Medium.ttf"
+				color: (1, 0, 0, 1)
+				size_hint: (0.55, 1)
+
+
+
+<TaskScreen>:
+
+	BoxLayout:
+		orientation: "vertical"
+		spacing: 5
+		padding: (0, 5, 0, 0)		
+		canvas.before:
+			Rectangle:
+				size: self.size
+				source: "data/images/"  + root.theme + ".png"
+
+		BoxLayout:
+			orientation: "horizontal"
+			spacing: 5
+			size_hint: (1, .05)
+			id: statusBar
+
+			Label:
+				size_hint: (.1, 1)
+
+			Label:
+				size_hint: (.2, 1)
+				id: statusDate
+				font_name: "fonts/Roboto-Medium.ttf"
+				text: root.getDate()
+				size: self.texture_size
+				color: root.textColor
+
+			Label:
+				size_hint: (0.5, 1)
+
+			Label:
+				size_hint: (.1, 1)
+				id: statusTime
+				font_name: "fonts/Roboto-Medium.ttf"
+				text: root.getTime()
+				size: self.texture_size
+				color: root.textColor
+
+			Label:
+				size_hint: (.1, 1)
+
+
+		BoxLayout:
+			orientation: "horizontal"
+			spacing: 5
+			size_hint: (1, .75)
+			id: taskBar
+
+			Button:
+				size_hint: .2, 1
+				background_color: (0, 0, 0, 0)
+				background_disabled_down: ""
+				background_disabled_normal: ""
+				background_down: ""
+				background_normal: ""
+				on_press: root.prevGraph()
+
+				Image:
+					x: self.parent.x + (self.parent.width - self.width) / 2
+					y: self.parent.y + (self.parent.height - self.height) / 2
+					source: "data/icons/" + root.theme + "/png/32/br_prev.png" if root.goals else ""
+					size: self.parent.size if root.goals else (0, 0)
+			BoxLayout:
+				orientation: "vertical"
+				Label:
+					id: goalName
+					text: root.goals[root.current]["title"] if root.goals else "NO GOALS"
+					size: self.texture_size
+					font_name: "fonts/Roboto-Medium.ttf"
+					font_size: 24
+					color: root.textColor
+				Label:
+					id: needToDo
+					text: "Need to do: " + root.goals[root.current]["limsum"] if root.goals else "It seems that you haven't created goals yet."
+					size: self.texture_size
+					font_name: "fonts/Roboto-Medium.ttf"
+					font_size: 20
+					color: root.textColor
+				Label:
+					id: dueDate
+					text: "Due: " + datetime.datetime.fromtimestamp (root.goals[root.current]["goaldate"]).strftime ("%d %B %Y") if root.goals else "Visit beeminder.com, register and create your goals."
+					size: self.texture_size
+					font_name: "fonts/Roboto-Medium.ttf"
+					font_size: 20
+					color: root.textColor
+				Label:
+					id: currDeadline
+					text: "Next deadline: " + datetime.datetime.fromtimestamp (root.goals[root.current]["losedate"]).strftime ("%H:%M %d %B %Y") if root.goals else ""
+					size: self.texture_size
+					font_name: "fonts/Roboto-Medium.ttf"
+					font_size: 20
+					color: root.textColor
+
+				BoxLayout:
+					orientation: "horizontal"
+					Label:
+						size_hint: (.1, 1)
+					Button:
+						size_hint: (.2, 1)
+						background_color: (0, 0, 0, 0)
+						background_disabled_down: ""
+						background_disabled_normal: ""
+						background_down: ""
+						background_normal: ""
+						on_press: root.showGraph()
+						Image:
+							x: self.parent.x + (self.parent.width - self.width) / 2
+							y: self.parent.y + (self.parent.height - self.height) / 2
+							source: "data/icons/" + root.theme + "/png/48/chart_line.png" if root.goals else ""
+							size: self.parent.size if root.goals else (0, 0)
+					Label:
+						size_hint: (.1, 1)
+					Button:
+						size_hint: (.2, 1)
+						background_color: (0, 0, 0, 0)
+						background_disabled_down: ""
+						background_disabled_normal: ""
+						background_down: ""
+						background_normal: ""
+						on_press: root.showInfo()
+						Image:
+							x: self.parent.x + (self.parent.width - self.width) / 2
+							y: self.parent.y + (self.parent.height - self.height) / 2
+							source: "data/icons/" + root.theme + "/png/48/doc_lines_stright.png" if root.goals else ""
+							size: self.parent.size if root.goals else (0, 0)
+					Label:
+						size_hint: (.1, 1)
+					Button:
+						size_hint: (.2, 1)
+						background_color: (0, 0, 0, 0)
+						background_disabled_down: ""
+						background_disabled_normal: ""
+						background_down: ""
+						background_normal: ""
+						on_press: root.addData()
+						Image:
+							x: self.parent.x + (self.parent.width - self.width) / 2
+							y: self.parent.y + (self.parent.height - self.height) / 2
+							source: "data/icons/" + root.theme + "/png/48/round_plus.png" if root.goals else ""
+							size: self.parent.size if root.goals else (0, 0)
+					Label:
+						size_hint: (.1, 1)
+
+
+
+			Button:
+				size_hint: .2, 1
+				background_color: (0, 0, 0, 0)
+				background_disabled_down: ""
+				background_disabled_normal: ""
+				background_down: ""
+				background_normal: ""
+				on_press: root.nextGraph()
+
+				Image:
+					x: self.parent.x + (self.parent.width - self.width) / 2
+					y: self.parent.y + (self.parent.height - self.height) / 2
+					source: "data/icons/" + root.theme + "/png/32/br_next.png" if root.goals else ""
+					size: self.parent.size if root.goals else (0, 0)
+
+		BoxLayout:
+			orientation: "horizontal"
+			spacing: 5
+			size_hint: (1, .2)
+			id: buttonBar
+
+			Button:
+				size_hint: (0.15, 1)
+				background_color: (0, 0, 0, 0)
+				background_disabled_down: ""
+				background_disabled_normal: ""
+				background_down: ""
+				background_normal: ""
+
+				on_press: root.goToSettingsScreen()
+
+				Image:
+					x: self.parent.x + (self.parent.width - self.width) / 2
+					y: self.parent.y + (self.parent.height - self.height) / 2
+					source: "data/icons/" + root.theme + "/png/32/cog.png"
+
+			Button:
+				size_hint: (0.15, 1)
+				background_color: (0, 0, 0, 0)
+				background_disabled_down: ""
+				background_disabled_normal: ""
+				background_down: ""
+				background_normal: ""
+
+				on_press: root.goToSleepScreen()
+
+				Image:
+					x: self.parent.x + (self.parent.width - self.width) / 2
+					y: self.parent.y + (self.parent.height - self.height) / 2
+					source: "data/icons/" + root.theme + "/png/32/padlock_closed.png"
+
+			Button:
+				size_hint: (0.15, 1)
+				background_color: (0, 0, 0, 0)
+				background_disabled_down: ""
+				background_disabled_normal: ""
+				background_down: ""
+				background_normal: ""
+
+				on_press: root.manager.current = "infoScreen"
+
+				Image:
+					x: self.parent.x + (self.parent.width - self.width) / 2
+					y: self.parent.y + (self.parent.height - self.height) / 2
+					source: "data/icons/" + root.theme + "/png/32/info.png"
+
+			Button:
+				size_hint: (0.15, 1)
+				background_color: (0, 0, 0, 0)
+				background_disabled_down: ""
+				background_disabled_normal: ""
+				background_down: ""
+				background_normal: ""
+
+				on_press: root.showEvents()
+
+				Image:
+					x: self.parent.x + (self.parent.width - self.width) / 2
+					y: self.parent.y + (self.parent.height - self.height) / 2
+					source: "data/icons/" + root.theme + "/png/32/calendar_1.png"
+
+			Label:
+				size_hint: (0.25, 1)
+
+			Button:
+				size_hint: (0.15, 1)
+				background_color: (0, 0, 0, 0)
+				background_disabled_down: ""
+				background_disabled_normal: ""
+				background_down: ""
+				background_normal: ""
+
+				on_press: root.checkLogout()
+
+				Image:
+					x: self.parent.x + (self.parent.width - self.width) / 2
+					y: self.parent.y + (self.parent.height - self.height) / 2
+					source: "data/icons/" + root.theme + "/png/32/delete.png"
+
+
+
+<CustomLayout>
+	canvas.before:
+		BorderImage:
+			border: 10, 10, 10, 10
+			texture: self.background_image.texture
+			pos: self.pos
+			size: self.size
+
+
+<SleepScreen>:
+	CustomLayout:
+		size_hint: 1, 1
+		Button:
+			size: self.parent.size
+			background_color: (0, 0, 0, 0)
+			background_disabled_down: ""
+			background_disabled_normal: ""
+			background_down: ""
+			background_normal: ""
+			on_press: root.returnBack()
+	BoxLayout:
+		canvas:
+			Color:
+				rgba: (1, 1, 1, 1)
+		orientation: "vertical"
+		pos: (self.parent.width / 20, 0)
+		size_hint: None, None
+		width: sleepGoal.width
+		spacing: 5
+		Label:
+			canvas:
+				Color:
+					rgba: (1, 1, 1, 1)
+			size_hint: (None, None)
+			id: sleepTime
+			text: root.getTime()
+			font_size: 48
+			font_name: "fonts/Roboto-Thin.ttf"
+			x: sleepGoal.x
+			size: self.texture_size
+			color: root.textColor
+		Label:
+			canvas:
+				Color:
+					rgba: (1, 1, 1, 1)
+			size_hint: (None, None)
+			id: sleepDate
+			text: root.getDate()
+			font_size: 16
+			font_name: "fonts/Roboto-Thin.ttf"
+			x: sleepGoal.x
+			size: self.texture_size
+			color: root.textColor
+		Label:
+			canvas:
+				Color:
+					rgba: (1, 1, 1, 1)
+			size_hint: (None, None)
+			id: sleepGoal
+			text: root.getNearestGoal()
+			font_size: 16
+			font_name: "fonts/Roboto-Thin.ttf"
+			size: self.texture_size
+			color: root.textColor
+
+
+<SettingsScreen>:
+
+	BoxLayout:
+		id: settingsBG
+		orientation: "vertical"
+
+		canvas.before:
+			Rectangle:
+				size: self.size
+				source: "data/images/" + root.theme + ".png"
+		spacing: 5
+		padding: (0, 5, 0, 0)
+
+		BoxLayout:
+			orientation: "horizontal"
+			spacing: 5
+			size_hint: (1, .05)
+			id: statusBar
+
+			Label:
+				size_hint: (.1, 1)
+
+			Label:
+				size_hint: (.2, 1)
+				id: statusDate
+				font_name: "fonts/Roboto-Medium.ttf"
+				text: root.getDate()
+				size: self.texture_size
+				color: root.textColor
+
+			Label:
+				size_hint: (0.5, 1)
+
+			Label:
+				size_hint: (.1, 1)
+				id: statusTime
+				font_name: "fonts/Roboto-Medium.ttf"
+				text: root.getTime()
+				size: self.texture_size
+				color: root.textColor
+
+			Label:
+				size_hint: (.1, 1)
+
+
+		BoxLayout:
+			orientation: "horizontal"
+			spacing: 5
+			size_hint: (1, .2)
+			id: tabSelect
+
+
+			Button:
+				size_hint: None, 1
+				background_color: (0, 0, 0, 0)
+				background_disabled_down: ""
+				background_disabled_normal: ""
+				background_down: ""
+				background_normal: ""
+				on_press: root.prevTab()
+
+				Image:
+					x: self.parent.x
+					y: self.parent.y + (self.parent.height - self.height) / 2
+					source: "data/icons/" + root.theme + "/png/32/br_prev.png"
+
+
+			Label:
+				id: tabName
+				size_hint_y: 1
+				text: root.tabs[root.current]
+				font_size: 24
+				font_name: "fonts/Roboto-Medium.ttf"
+				size: self.texture_size
+				color: root.textColor
+
+
+			Button:
+				size_hint: None, 1
+				background_color: (0, 0, 0, 0)
+				background_disabled_down: ""
+				background_disabled_normal: ""
+				background_down: ""
+				background_normal: ""
+				on_press: root.nextTab()
+
+				Image:
+					x: self.parent.x
+					y: self.parent.y + (self.parent.height - self.height) / 2
+					source: "data/icons/" + root.theme + "/png/32/br_next.png"
+
+
+
+		AnchorLayout:
+			anchor_x: "center"
+			anchor_y: "center"
+			size_hint: (1, .70)
+			padding: (5, 0, 5, 0)
+			BoxLayout:
+				id: settingsContent
+				orientation: "vertical"
+				size_hint_y: .8
+				size_hint_x: .6
+				height: self.row_default_height * 10
+				row_default_height: 32
+				row_force_default: True
+				spacing: 5
+				BoxLayout:
+					size_hint: (1, .3)
+					orientation: "horizontal"
+					spacing: 5
+					NoImageButton:
+						on_press: root.hour1Up()
+					NoImageButton:
+						opacity: .3
+						on_press: root.hour2Up()
+					Label:
+						size_hint: (.2, 1)
+					NoImageButton:
+						opacity: .3
+						on_press: root.min1Up()
+					NoImageButton:
+						opacity: .3
+						on_press: root.min2Up()
+
+				BoxLayout:
+					size_hint: (1, .4)
+					orientation: "horizontal"
+					spacing: 5
+					Label:
+						size_hint: (.2, 1)
+						text: root.timeList[0]
+						font_size: 36
+						color: root.textColor
+					Label:
+						size_hint: (.2, 1)
+						text: root.timeList[1]
+						font_size: 36
+						color: root.textColor
+					Label:
+						size_hint: (.2, 1)
+						text: ":"
+						font_size: 36
+						color: root.textColor
+					Label:
+						size_hint: (.2, 1)
+						text: root.timeList[2]
+						font_size: 36
+						color: root.textColor
+					Label:
+						size_hint: (.2, 1)
+						text: root.timeList[3]
+						font_size: 36
+						color: root.textColor
+
+
+				BoxLayout:
+					size_hint: (1, .3)
+					orientation: "horizontal"
+					spacing: 5
+					NoImageButton:
+						on_press: root.hour1Down()
+					NoImageButton:
+						opacity: .3
+						on_press: root.hour2Down()
+					Label:
+						size_hint: (.2, 1)
+					NoImageButton:
+						opacity: .3
+						on_press: root.min1Down()
+					NoImageButton:
+						opacity: .3
+						on_press: root.min2Down()
+
+		BoxLayout:
+			orientation: "horizontal"
+			size_hint: (1, .15)
+			Button:
+				background_color: (0, 0, 0, 0)
+				background_disabled_down: ""
+				background_disabled_normal: ""
+				background_down: ""
+				background_normal: ""
+				text: "Save"
+				font_size: 24
+				font_name: "fonts/Roboto-Medium.ttf"
+				on_press: root.saveChanges()
+				color: root.textColor
+			Button:
+				canvas:
+					Color:
+						rgba: (1, 1, 1, 1)
+				background_color: (0, 0, 0, 0)
+				background_disabled_down: ""
+				background_disabled_normal: ""
+				background_down: ""
+				background_normal: ""
+				text: "Discard"
+				font_size: 24
+				font_name: "fonts/Roboto-Medium.ttf"
+				on_press: root.discardChanges()
+				color: root.textColor
+
+
+<InfoScreen>:
+	BoxLayout:
+		orientation: "vertical"
+
+		canvas.before:
+			Rectangle:
+				size: self.size
+				source: "data/images/" + root.theme + ".png"
+		spacing: 5
+		padding: (0, 5, 0, 0)
+
+		BoxLayout:
+			orientation: "horizontal"
+			spacing: 5
+			size_hint: (1, .05)
+			id: statusBar
+
+			Label:
+				size_hint: (.1, 1)
+
+			Label:
+				size_hint: (.2, 1)
+				id: statusDate
+				font_name: "fonts/Roboto-Medium.ttf"
+				text: root.getDate()
+				size: self.texture_size
+				color: root.textColor
+
+			Label:
+				size_hint: (0.5, 1)
+
+			Label:
+				size_hint: (.1, 1)
+				id: statusTime
+				font_name: "fonts/Roboto-Medium.ttf"
+				text: root.getTime()
+				size: self.texture_size
+				color: root.textColor
+
+			Label:
+				size_hint: (.1, 1)
+
+
+		BoxLayout:
+			orientation: "vertical"
+			spacing: 5
+			size_hint: (1, .65)
+			Label:
+				text: "Powered by:"
+				size: self.texture_size
+				font_name: "fonts/Roboto-Medium.ttf"
+				font_size: 24
+				color: root.textColor
+			BoxLayout:
+				orientation: "horizontal"
+				spacing: 5
+				Image:
+					source: "data/images/bm_logo.png"
+				Image:
+					source: "data/images/kivy_logo.png"
+				Image:
+					source: "data/images/rp_logo.png"
+		BoxLayout:
+			size_hint: (1, .3)
+
+	Button:
+		background_color: (0, 0, 0, 0)
+		background_disabled_down: ""
+		background_disabled_normal: ""
+		background_down: ""
+		background_normal: ""
+		size_hint: (1, 1)
+		on_press: root.goBack()
